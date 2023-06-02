@@ -1,0 +1,28 @@
+#!/bin/sh
+start() {
+	SD_DEVICE=$(busybox blkid | grep -o '/dev/mmcblk[0-9]p[0-9]')
+	if [ -n "$SD_DEVICE" ]; then
+	    SD_FS=$(busybox blkid $SD_DEVICE | awk -F '[=:"]' '{print $7}')
+	    if [ "$SD_FS" = "ext2" ]; then
+	        mkdir -p /tmp/mmcblk
+	        mount -t ext2 $SD_DEVICE /tmp/mmcblk
+	    else
+	        echo "ext2 sd card not found"
+	    fi
+	else
+	echo "sd card not found"
+	fi
+
+	return 0
+}
+
+case "$1" in
+  start)
+    start
+    ;;  
+  *)  
+    echo "Usage: $0 {start}"
+    exit 1
+esac
+
+exit $?
